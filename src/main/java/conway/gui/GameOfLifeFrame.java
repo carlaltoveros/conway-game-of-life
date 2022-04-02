@@ -5,7 +5,6 @@ import java.awt.*;
 
 /**
  * Unfinished, still learning Swing
- * TODO: finish this if I have time
  */
 public class GameOfLifeFrame extends JFrame {
 

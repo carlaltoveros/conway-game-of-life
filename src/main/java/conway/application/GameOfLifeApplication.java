@@ -1,5 +1,15 @@
 package conway.application;
 
+/** TODO: GameOfLife.java
+ *          figure out how to simulate this with a larger / infinite board
+ *            if this is the case then don't take a height and width as params and just have a giant board
+ *          update the logic when the cells reach the visible boarders (corners?)
+ *  TODO: GameOfLifeFrame.java
+ *          GUI work
+ *          learn Swing lol
+ *  TODO: GameOfLifeApplication
+ *          input handling, no hardcoded stuff
+ */
 public class GameOfLifeApplication {
 
     public static void main(String[] args) throws InterruptedException {
