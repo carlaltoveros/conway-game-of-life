@@ -20,7 +20,7 @@ public class GameOfLifeFrame extends JFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.getContentPane().setBackground(new Color(48, 48, 48));
-        frame.setLayout(new GridLayout(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        frame.setLayout(new GridLayout(GameOfLife.DIMENSION, GameOfLife.DIMENSION));
         frame.setVisible(true);
 
     }
