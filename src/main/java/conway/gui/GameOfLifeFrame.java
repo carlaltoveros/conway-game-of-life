@@ -1,5 +1,7 @@
 package conway.gui;
 
+import conway.application.GameOfLife;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,15 +10,24 @@ import java.awt.*;
  */
 public class GameOfLifeFrame extends JFrame {
 
-    public GameOfLifeFrame() {
+    private JFrame frame;
+    private GameOfLife gameOfLife;
 
-        JFrame frame = new JFrame("The Secret of the Universe");
+    public GameOfLifeFrame(GameOfLife gameOfLife) {
+
+        this.gameOfLife = gameOfLife;
+        frame = new JFrame("The Secret of the Universe");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 600);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.getContentPane().setBackground(new Color(48, 48, 48));
+        frame.setLayout(new GridLayout(Integer.MAX_VALUE, Integer.MAX_VALUE));
         frame.setVisible(true);
 
     }
+
+
+
+
 
 
 }

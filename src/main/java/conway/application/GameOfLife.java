@@ -1,8 +1,8 @@
 package conway.application;
 
-import java.util.ArrayList;
+import conway.helper.Cell;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,137 +30,113 @@ import java.util.Set;
 public class GameOfLife {
 
     // 2D grid || 0 is dead, 1 is alive
-    private int width;
-    private int height;
-    private int middleColumn;
-    private int middleRow;
-    private int maxColumnIndex;
-    private int maxRowIndex;
+    // TODO: uncomment this max value and delete this current value
+//    public static final int DIMENSION = Integer.MAX_VALUE;
+    public static final int DIMENSION = 1001;
+    public static final int CENTER = DIMENSION / 2;
 
-    private int[][] gameBoard;
+    private Set<Cell> currentAliveCells;
 
-    public GameOfLife(int width, int height) {
-        setWidth(width);
-        setHeight(height);
-        this.gameBoard = new int[width][height ];
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-        this.maxColumnIndex = width -1;
-        this.middleColumn = width / 2;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-        this.maxRowIndex = height - 1;
-        this.middleRow = height / 2;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int[][] getGameBoard() {
-        return gameBoard;
-    }
-
-    public void setToAlive(int column, int row) {
-        this.gameBoard[column][row] = 1;
-    }
-
-    public void setToAlive(int[] pair) {
-        this.gameBoard[pair[0]][pair[1]] = 1;
-    }
-
-    public void setToDead(int column, int row) {
-        this.gameBoard[column][row] = 0;
-    }
-
-    public void setToDead(int[] pair) {
-        this.gameBoard[pair[0]][pair[1]] = 0;
+    public GameOfLife(Set<Cell> currentAliveCells) {
+        this.currentAliveCells = currentAliveCells;
     }
 
     public void simulate(int iterations, long sleepTime) throws InterruptedException {
         for (int i = 0; i < iterations; i++) {
-            System.out.println(String.format("Iteration: %2d", i));
-            simulateNext();
-            printGameBoard();
-            Thread.sleep(sleepTime);
+            try {
+                System.out.printf("Iteration: %2d%n", i + 1);
+                simulateNext();
+                System.out.printf("Found %d alive cells%n", currentAliveCells.size());
+                //printBoard();
+                Thread.sleep(sleepTime);
+            } catch(OutOfMemoryError e) {
+                System.out.printf("Found %d alive cells%n", currentAliveCells.size());
+                throw e;
+            }
         }
     }
 
-    public void printGameBoard() {
+    public void printBoard() {
         StringBuilder sb;
-        for (int row = 0; row < height; row++) {
+        for (int row = 0; row < DIMENSION; row++) {
             sb = new StringBuilder();
             sb.append("|");
-            for (int column = 0; column < width; column++) {
-                int[] coordinates = indecesToCoordinates(column, row);
-                // sb.append(String.format(" %2d,%2d ", coordinates[0], coordinates[1])); // print a graph representation of the board with coordinates
-                sb.append(String.format("%2d", gameBoard[column][row])); // print the values of the board
+            for (int column = 0; column < DIMENSION; column++) {
+                Cell cell = new Cell(column, row);
+                int alive =  currentAliveCells.contains(cell) ? 1 : 0;
+                sb.append(String.format("%2d", alive)); // print the values of the board
             }
             sb.append(" |");
             System.out.println(sb.toString());
         }
     }
-
     /**
      * Simulates the next iteration
      */
     private void simulateNext() {
-        List<int[]> futureDeadCells = new ArrayList<>();
-        List<int[]> futureAliveCells = new ArrayList<>();
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width; column++) {
-                int aliveNeighbors = getNumAliveNeighbors(column, row);
-                if (gameBoard[column][row] == 1) {
+        Set<Cell> newAliveCells = new HashSet<>();
+        Set<Cell> newDeadCells = new HashSet<>();
+        for (int row = 0; row < DIMENSION; row++) {
+            for (int column = 0; column < DIMENSION; column++) {
+                Cell cell = new Cell(column, row);
+                Set<int[]> pointsToCheck = getPointsToCheck(cell);
+                int aliveNeighbors = getNumAliveNeighbors(cell, pointsToCheck);
+                if (currentAliveCells.contains(cell)) {
                     // alive cell
                     if (aliveNeighbors < 2 || aliveNeighbors > 3) {
-                        futureDeadCells.add(new int[]{column, row});
+                        newDeadCells.add(cell);
                     }
-                } else if (gameBoard[column][row] == 0) {
+                } else {
                     // dead cell
                     if (aliveNeighbors == 3) {
-                        futureAliveCells.add(new int[]{column, row});
+                        newAliveCells.add(cell);
                     }
                 }
             }
         }
 
-        updateCells(futureDeadCells, futureAliveCells);
+        currentAliveCells.removeAll(newDeadCells);
+        currentAliveCells.addAll(newAliveCells);
     }
 
     /**
-     * Updates cells to dead or alive given two lists of cells to update
-     * @param futureDeadCells
-     * @param futureAliveCells
+     * Get the number of alive neighbors based on the given cells and points to check
+     * points to check is a calculated Set of points to check around the given cells
+     *      most of the time this is the 8 points around that cell, but in some cases like edges/corners,
+     *      we only check a subset to avoid index oob errors
+     * @param cell
+     * @param pointsToCheck
+     * @return
      */
-    private void updateCells(List<int[]> futureDeadCells, List<int[]> futureAliveCells) {
-        for (int[] cell : futureDeadCells) {
-            setToDead(cell);
+    private int getNumAliveNeighbors(Cell cell, Set<int[]> pointsToCheck) {
+        int count = 0;
+
+        int column = cell.getColumn();
+        int row = cell.getRow();
+        for (int[] points : pointsToCheck) {
+            Cell checkCell = new Cell(column + points[0], row + points[1]);
+            if (currentAliveCells.contains(checkCell)) {
+                count+=1;
+            }
         }
-        for (int[] cell: futureAliveCells) {
-            setToAlive(cell);
-        }
+
+        return count;
     }
 
     /**
      * Return a set of int[] arrays where the first value represents an int to add to a column and the second value represents an int to add to the row
      * this covers all 8 surrounding sides of a point by default
      *  and removes points to check from the set if:
-     *      column coordinate is the left or right most
-     *      row coordinate is the top or bottom most
+     *      column cell is the left or right most
+     *      row cell is the top or bottom most
      *
-     * @param column
-     * @param row
+     * @param cell
      * @return
      */
-    private Set<int[]> getPointsToCheck(int column, int row) {
+    private Set<int[]> getPointsToCheck(Cell cell) {
+        int column = cell.getColumn();
+        int row = cell.getRow();
+
         Set<int[]> pointsToCheck = new HashSet<>();
         pointsToCheck.add(new int[] {0, 1}); // one up
         pointsToCheck.add(new int[] {0, -1}); // one down
@@ -175,7 +151,7 @@ public class GameOfLife {
         if (column == 0) {
             // we are at the left most column, remove all the points that subtract 1 from column
             pointsToCheck.removeIf( point -> point[0]==-1 );
-        } else if (column == maxColumnIndex) {
+        } else if (column == DIMENSION) {
             // we are at the left most column, remove all points that add 1 to column
             pointsToCheck.removeIf( point -> point[0]==1 );
         }
@@ -183,73 +159,12 @@ public class GameOfLife {
         if (row == 0) {
             // we are at the top most row, remove all points that subtract 1 from row
             pointsToCheck.removeIf( point -> point[1]==-1 );
-        } else if (row == maxRowIndex) {
+        } else if (row == DIMENSION) {
             // we are at the bottom most row, remove all points that add 1 to row
             pointsToCheck.removeIf( point -> point[1]==1 );
         }
 
         return pointsToCheck;
-    }
-
-    /**
-     * Get the number of alive neighbors based on the column and row
-     * @param column
-     * @param row
-     * @return
-     */
-    private int getNumAliveNeighbors(int column, int row) {
-        int count = 0;
-
-        Set<int[]> pointsToCheck = getPointsToCheck(column, row);
-
-        for (int[] points : pointsToCheck) {
-            count += gameBoard[column + points[0]][row + points[1]];
-        }
-
-        return count;
-    }
-
-    /**
-     * Converts given coordinates to the indeces representation in the 2D array
-     * for example:
-     *  in a 11x11 board MIDDLE = rounded down width / 2 and height / 2
-     *    (0, 0) represents the the middle of the board so      (0, 0) is column 5 row 5
-     *    (5, 5) represents the top right of the board so       (5, 5) is column 10, row 0
-     *    (-5, 5) represents the top left of the board so       (-5, 5) is column 0, row 0
-     *    (5, -5) represents the bottom right of the board so   (5, -5) is column 10, row 10
-     *    (-5, -5) represents the bottom left of the board so   (-5, -5) is column 0, row 10
-     *
-     *      FIRST QUADRANT (top right)
-     *                                                          (1, 1) is column 6, row 4       (middle + x, middle - y)
-     *                                                          (2, 3) is column 7, row 2       (middle + x, middle - y)
-     *      SECOND QUADRANT (top left)
-     *                                                          (-3, 4) is column 1, row 1      (middle + x, middle - y)
-     *                                                          (-1, 2) is column 4, row 3      (middle + x, middle - y)
-     *      THIRD QUADRANT (bottom left)
-     *                                                          (-2, -5) is column 3, row 10    (middle + x, middle - y)
-     *                                                          (-3, -1) is column 2, row 6     (middle + x, middle - y)
-     *                                                          (-2, -2) is column 3, row 7     (middle + x, middle - y)
-     *      FOURTH QUADRANT (bottom right)
-     *                                                          (4, -4) is column 9, row 9      (middle + x, middle - y)
-     *                                                          (3, -2) is column 8, row 7      (middle + x, middle - y)
-     * @param x
-     * @param y
-     * @return
-     */
-    public int[] coordinateToIndeces(int x, int y) {
-        return new int[] {middleColumn + x, middleRow - y};
-    }
-
-    /**
-     * Inverse of the above function
-     *   x = column - middle
-     *   y = row - middle
-     * @param column
-     * @param row
-     * @return
-     */
-    public int[] indecesToCoordinates(int column, int row) {
-        return new int[]{ column - middleColumn, middleRow - row};
     }
 
 }
