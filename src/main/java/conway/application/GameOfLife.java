@@ -49,7 +49,7 @@ public class GameOfLife {
                 System.out.printf("Iteration: %2d%n", i + 1);
                 simulateNext();
                 System.out.printf("Found %d alive cells%n", currentAliveCells.size());
-                //printBoard();
+                printCenterBoard();
                 Thread.sleep(sleepTime);
             } catch(OutOfMemoryError e) {
                 System.out.printf("Found %d alive cells%n", currentAliveCells.size());
@@ -58,12 +58,13 @@ public class GameOfLife {
         }
     }
 
-    public void printBoard() {
+    public void printCenterBoard() {
         StringBuilder sb;
-        for (int row = 0; row < DIMENSION; row++) {
+        int numSquares = 6;
+        for (int row = CENTER - numSquares; row < CENTER + numSquares + 1; row++) {
             sb = new StringBuilder();
             sb.append("|");
-            for (int column = 0; column < DIMENSION; column++) {
+            for (int column = CENTER - numSquares; column < CENTER + numSquares + 1; column++) {
                 Cell cell = new Cell(column, row);
                 int alive = currentAliveCells.contains(cell) ? 1 : 0;
                 sb.append(String.format("%2d", alive)); // print the values of the board
