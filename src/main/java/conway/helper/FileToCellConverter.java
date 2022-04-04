@@ -23,6 +23,13 @@ public class FileToCellConverter {
         }
     }
 
+    /**
+     * For each line in the file
+     *   ignore comment lines that start with #
+     *   split each line (formatted to have X (space or tabs) Y)
+     *   convert the indeces from x and y values to the appropriate column and row values
+     * @return
+     */
     public Set<Cell> getConvertedCells() {
         Set<Cell> cells = new HashSet<>();
         String line;
@@ -32,9 +39,9 @@ public class FileToCellConverter {
             if (!line.startsWith("#")) {
                 String[] splitLine = line.split("[ \\t]+");
                 try {
-                    int column = Integer.parseInt(splitLine[0]);
-                    int row = Integer.parseInt(splitLine[1]);
-                    Cell cell = CoordinateToCellConverter.coordinateToIndeces(column, row, GameOfLife.CENTER);
+                    int x = Integer.parseInt(splitLine[0]);
+                    int y = Integer.parseInt(splitLine[1]);
+                    Cell cell = CoordinateToCellConverter.coordinateToIndeces(x, y, GameOfLife.CENTER);
                     cells.add(cell);
                 } catch (NumberFormatException e) {
                     System.out.printf("Found illegal int value on line: %d, skipping...%n", lineNum);

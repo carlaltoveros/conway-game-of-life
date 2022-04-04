@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 
 public class GameOfLife {
 
-    // 2D grid || 0 is dead, 1 is alive
-    // TODO: change this to max value
     public static final int DIMENSION = Integer.MAX_VALUE;
     public static final int CENTER = DIMENSION / 2;
 
@@ -47,6 +45,13 @@ public class GameOfLife {
         this.currentAliveCells = currentAliveCells;
     }
 
+    /**
+     * Given number of iterations, performs the next step of the simulation
+     * Creates an output/ directory to add files to
+     *
+     * @param iterations
+     * @throws IOException
+     */
     public void simulate(int iterations) throws IOException {
         String dirName = "output";
         File outputDir = new File(dirName);
@@ -63,6 +68,17 @@ public class GameOfLife {
         }
     }
 
+    /**
+     * Writes the output to a file
+     *   Example:
+     *     Iteration#97
+     *     Found 2 alive cells
+     *       X: 0, Y: 2
+     *       X: -1000, Y: -1001010
+     * @param dirName
+     * @param iteration
+     * @throws IOException
+     */
     private void writeToFile(String dirName, int iteration) throws IOException {
         File newFile = new File(String.format("%s/iteration-%d.txt", dirName, iteration));
         if (newFile.createNewFile()) {
@@ -72,16 +88,20 @@ public class GameOfLife {
             writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
             for (Cell cell : currentAliveCells) {
                 Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
-                writer.append(String.format("X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
+                writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
             }
             writer.flush();
             writer.close();
         }
     }
 
+    /**
+     * Prints just the center of the board where 0 is a dead cell and 1 is an alive cell
+     *   opted to print a 13x13 board, mostly used for manual testing
+     */
     public void printCenterBoard() {
         StringBuilder sb;
-        int numSquares = 6; // how far left and right from the center should we print --> this produces a 13 x 13 board
+        int numSquares = Math.min(CENTER, 6); // how far left and right from the center should we print --> this produces a 13 x 13 board
         for (int row = CENTER - numSquares; row < CENTER + numSquares + 1; row++) {
             sb = new StringBuilder();
             sb.append("|");

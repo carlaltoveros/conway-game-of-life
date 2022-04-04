@@ -11,18 +11,19 @@ import java.util.Set;
  *  TODO: GameOfLifeFrame.java
  *          GUI work
  *          learn Swing lol
+ *          :(
  */
 public class GameOfLifeApplication {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Initializing Mini Universe");
 
-        int iterations = 20;
+        int iterations = 100;
         String iterationsStr = System.getProperty("iterations");
         try {
-            iterations = Integer.parseInt(System.getProperty("iterations", "20"));
+            iterations = Integer.parseInt(System.getProperty("iterations", "100"));
         } catch (NumberFormatException e) {
-            System.out.printf("Invalid iteration input: %s, using default value of 20%n", iterationsStr);
+            System.out.printf("Invalid iteration input: %s, using default value of 100%n", iterationsStr);
         }
 
         String fileName = System.getProperty("fileName", "cells.txt");
