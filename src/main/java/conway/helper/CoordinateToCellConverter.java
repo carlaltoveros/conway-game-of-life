@@ -1,6 +1,6 @@
 package conway.helper;
 
-public class CoordinateConverter {
+public class CoordinateToCellConverter {
 
     /**
      * Converts given coordinates to the indeces representation in the 2D array
@@ -38,12 +38,13 @@ public class CoordinateConverter {
      * Inverse of the above function
      *   x = column - middle
      *   y = row - middle
-     * @param column
-     * @param row
+     * @param cell
      * @param center
      * @return
      */
-    public static Cell indecesToCoordinates(int column, int row, int center) {
+    public static Cell indecesToCoordinates(Cell cell, int center) {
+        int column = cell.getColumn();
+        int row = cell.getRow();
         return new Cell(column - center, center - row);
     }
 }

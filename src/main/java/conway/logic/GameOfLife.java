@@ -1,7 +1,11 @@
-package conway.application;
+package conway.logic;
 
 import conway.helper.Cell;
+import conway.helper.CoordinateToCellConverter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,24 +47,41 @@ public class GameOfLife {
         this.currentAliveCells = currentAliveCells;
     }
 
-    public void simulate(int iterations, long sleepTime) throws InterruptedException {
+    public void simulate(int iterations) throws IOException {
+        String dirName = "output";
+        File outputDir = new File(dirName);
+        if (!outputDir.mkdir()) {
+            System.out.printf("Failed to create directory: %s. Please delete the directory and try again. Exiting...%n", dirName);
+            return;
+        }
         for (int i = 0; i < iterations; i++) {
-            try {
-                System.out.printf("Iteration: %2d%n", i + 1);
-                simulateNext();
-                System.out.printf("Found %d alive cells%n", currentAliveCells.size());
-                printCenterBoard();
-                Thread.sleep(sleepTime);
-            } catch(OutOfMemoryError e) {
-                System.out.printf("Found %d alive cells%n", currentAliveCells.size());
-                throw e;
+            System.out.printf("Iteration: %2d%n", i + 1);
+            simulateNext();
+            System.out.printf("Found %d alive cells%n", currentAliveCells.size());
+            printCenterBoard();
+            writeToFile(dirName, i + 1);
+        }
+    }
+
+    private void writeToFile(String dirName, int iteration) throws IOException {
+        File newFile = new File(String.format("%s/iteration-%d.txt", dirName, iteration));
+        if (newFile.createNewFile()) {
+            System.out.println(newFile.getAbsolutePath());
+            FileWriter writer = new FileWriter(newFile.getAbsolutePath(), true);
+            writer.append(String.format("Iteration #%d%n", iteration));
+            writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
+            for (Cell cell : currentAliveCells) {
+                Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
+                writer.append(String.format("X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
             }
+            writer.flush();
+            writer.close();
         }
     }
 
     public void printCenterBoard() {
         StringBuilder sb;
-        int numSquares = 6;
+        int numSquares = 6; // how far left and right from the center should we print --> this produces a 13 x 13 board
         for (int row = CENTER - numSquares; row < CENTER + numSquares + 1; row++) {
             sb = new StringBuilder();
             sb.append("|");
@@ -100,6 +121,7 @@ public class GameOfLife {
                 .filter( entry -> entry.getValue() == 3)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
+
         currentAliveCells.removeAll(newDeadCells);
         currentAliveCells.addAll(newAliveCells);
     }
