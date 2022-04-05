@@ -34,10 +34,12 @@ public class GameOfLifeFrame extends JPanel {
         for (int column = 0; column < gridCells.length; column++) {
 
         }
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(400, 250));
+        frame.setSize(800, 500);
         frame.getContentPane().setBackground(new Color(48, 48, 48));
         frame.setLayout(new GridLayout(DIMENSION, DIMENSION));
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
 

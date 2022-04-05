@@ -2,7 +2,7 @@ package conway.helper;
 
 import java.util.Objects;
 
-public class Cell {
+public class Cell implements Comparable<Cell> {
 
     private int column;
     private int row;
@@ -31,5 +31,17 @@ public class Cell {
     @Override
     public int hashCode() {
         return Objects.hash(column, row);
+    }
+
+    @Override
+    public int compareTo(Cell other) {
+        if (this.getColumn() > other.getColumn()) {
+            return 1;
+        } else if (this.getColumn() < other.getColumn()) {
+            return -1;
+        } else if (this.getColumn() == other.getColumn()) {
+            return -1 * Integer.compare(this.getRow(), other.getRow());
+        }
+        return 0;
     }
 }

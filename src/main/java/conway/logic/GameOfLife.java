@@ -2,14 +2,12 @@ package conway.logic;
 
 import conway.helper.Cell;
 import conway.helper.CoordinateToCellConverter;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,10 +52,8 @@ public class GameOfLife {
      */
     public void simulate(int iterations) throws IOException {
         String dirName = "output";
-        File outputDir = new File(dirName);
-        if (!outputDir.mkdir()) {
-            System.out.printf("Failed to create directory: %s. Please delete the directory and try again. Exiting...%n", dirName);
-            return;
+        if (!createDirectory(dirName)) {
+            System.out.printf("Failed to create directory: %s. Please try again. Exiting...%n", dirName);
         }
         for (int i = 0; i < iterations; i++) {
             System.out.printf("Iteration: %2d%n", i + 1);
@@ -68,6 +64,13 @@ public class GameOfLife {
         }
     }
 
+    private boolean createDirectory(String name) throws IOException {
+        File outputDir = new File(name);
+        if (outputDir.exists()) {
+            FileUtils.deleteDirectory(outputDir);
+        }
+        return outputDir.mkdir();
+    }
     /**
      * Writes the output to a file
      *   Example:
@@ -81,12 +84,13 @@ public class GameOfLife {
      */
     private void writeToFile(String dirName, int iteration) throws IOException {
         File newFile = new File(String.format("%s/iteration-%d.txt", dirName, iteration));
+        List<Cell> sortedCells = new ArrayList<>(currentAliveCells);
+        Collections.sort(sortedCells);
         if (newFile.createNewFile()) {
-            System.out.println(newFile.getAbsolutePath());
             FileWriter writer = new FileWriter(newFile.getAbsolutePath(), true);
             writer.append(String.format("Iteration #%d%n", iteration));
             writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
-            for (Cell cell : currentAliveCells) {
+            for (Cell cell : sortedCells) {
                 Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
                 writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
             }
@@ -97,11 +101,12 @@ public class GameOfLife {
 
     /**
      * Prints just the center of the board where 0 is a dead cell and 1 is an alive cell
-     *   opted to print a 13x13 board, mostly used for manual testing
+     *   opted to print a 21x21 board, mostly used for manual testing
      */
     public void printCenterBoard() {
+        System.out.println("Printing center 21x21 board");
         StringBuilder sb;
-        int numSquares = Math.min(CENTER, 6); // how far left and right from the center should we print --> this produces a 13 x 13 board
+        int numSquares = Math.min(CENTER, 10); // how far left and right from the center should we print --> this produces a 13 x 13 board
         for (int row = CENTER - numSquares; row < CENTER + numSquares + 1; row++) {
             sb = new StringBuilder();
             sb.append("|");
@@ -111,6 +116,9 @@ public class GameOfLife {
                 sb.append(String.format("%2d", alive)); // print the values of the board
             }
             sb.append(" |");
+            if (row == CENTER) {
+                sb.append(" CENTER ROW");
+            }
             System.out.println(sb);
         }
     }
