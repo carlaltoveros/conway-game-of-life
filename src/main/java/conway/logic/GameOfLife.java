@@ -93,8 +93,9 @@ public class GameOfLife {
      *  new dead cells are found by getting a count of alive neighbors for each cell
      *  new alive cells are found by getting a count of each cell around each alive cell
      *      (see comment for getCellToAliveNeighborMap for better explanation)
+     * @return
      */
-    private void simulateNext() {
+    public Set<Cell> simulateNext() {
         Map<Cell, Integer> cellToAliveNeighborMap = new HashMap<>();
         Set<Cell> newDeadCells = new HashSet<>();
         for (Cell cell : currentAliveCells) {
@@ -116,6 +117,8 @@ public class GameOfLife {
 
         currentAliveCells.removeAll(newDeadCells);
         currentAliveCells.addAll(newAliveCells);
+
+        return currentAliveCells;
     }
 
     /**
