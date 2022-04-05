@@ -4,6 +4,7 @@ Game of Life Java Solution
 #Instructions:
 
  ####On IDE (I personally used IntelliJ CE)
+    
     1. Clone the project to a directory
 
     2. Open the conway-game-of-life directory/ as a project
@@ -20,6 +21,7 @@ Game of Life Java Solution
         - Each text file consists of the number of alive cells plus coordinates for each of those cells
 
  ####On command line
+    
     1. Clone the project to a directory
 
     2. Edit the cells.txt and fill in coordinates as desired
