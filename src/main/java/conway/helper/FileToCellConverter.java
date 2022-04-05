@@ -36,7 +36,7 @@ public class FileToCellConverter {
         int lineNum = 1;
         while (scanner.hasNextLine()) {
             line = scanner.nextLine().strip();
-            if (!line.startsWith("#")) {
+            if (!line.startsWith("#") && !line.isBlank()) {
                 String[] splitLine = line.split("[ \\t]+");
                 try {
                     int x = Integer.parseInt(splitLine[0]);

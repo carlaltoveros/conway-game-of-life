@@ -64,41 +64,6 @@ public class GameOfLife {
         }
     }
 
-    private boolean createDirectory(String name) throws IOException {
-        File outputDir = new File(name);
-        if (outputDir.exists()) {
-            FileUtils.deleteDirectory(outputDir);
-        }
-        return outputDir.mkdir();
-    }
-    /**
-     * Writes the output to a file
-     *   Example:
-     *     Iteration#97
-     *     Found 2 alive cells
-     *       X: 0, Y: 2
-     *       X: -1000, Y: -1001010
-     * @param dirName
-     * @param iteration
-     * @throws IOException
-     */
-    private void writeToFile(String dirName, int iteration) throws IOException {
-        File newFile = new File(String.format("%s/iteration-%d.txt", dirName, iteration));
-        List<Cell> sortedCells = new ArrayList<>(currentAliveCells);
-        Collections.sort(sortedCells);
-        if (newFile.createNewFile()) {
-            FileWriter writer = new FileWriter(newFile.getAbsolutePath(), true);
-            writer.append(String.format("Iteration #%d%n", iteration));
-            writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
-            for (Cell cell : sortedCells) {
-                Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
-                writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
-            }
-            writer.flush();
-            writer.close();
-        }
-    }
-
     /**
      * Prints just the center of the board where 0 is a dead cell and 1 is an alive cell
      *   opted to print a 21x21 board, mostly used for manual testing
@@ -244,6 +209,48 @@ public class GameOfLife {
         }
 
         return pointsToCheck;
+    }
+
+    /**
+     * Create a directory and override if it already exists (this is used to write output files to)
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    private boolean createDirectory(String name) throws IOException {
+        File outputDir = new File(name);
+        if (outputDir.exists()) {
+            FileUtils.deleteDirectory(outputDir);
+        }
+        return outputDir.mkdir();
+    }
+
+    /**
+     * Writes the output to a file
+     *   Example:
+     *     Iteration#97
+     *     Found 2 alive cells
+     *       X: 0, Y: 2
+     *       X: -1000, Y: -1001010
+     * @param dirName
+     * @param iteration
+     * @throws IOException
+     */
+    private void writeToFile(String dirName, int iteration) throws IOException {
+        File newFile = new File(String.format("%s/iteration-%d.txt", dirName, iteration));
+        List<Cell> sortedCells = new ArrayList<>(currentAliveCells);
+        Collections.sort(sortedCells);
+        if (newFile.createNewFile()) {
+            FileWriter writer = new FileWriter(newFile.getAbsolutePath(), true);
+            writer.append(String.format("Iteration #%d%n", iteration));
+            writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
+            for (Cell cell : sortedCells) {
+                Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
+                writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
+            }
+            writer.flush();
+            writer.close();
+        }
     }
 
 }

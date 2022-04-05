@@ -7,12 +7,6 @@ import conway.helper.FileToCellConverter;
 import java.io.IOException;
 import java.util.Set;
 
-/**
- *  TODO: GameOfLifeFrame.java
- *          GUI work
- *          learn Swing lol
- *          :(
- */
 public class GameOfLifeApplication {
 
     public static void main(String[] args) throws IOException {
