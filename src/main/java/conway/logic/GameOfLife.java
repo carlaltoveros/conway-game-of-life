@@ -1,7 +1,6 @@
 package conway.logic;
 
 import conway.helper.Cell;
-import conway.helper.CoordinateToCellConverter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -245,7 +244,7 @@ public class GameOfLife {
             writer.append(String.format("Iteration #%d%n", iteration));
             writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
             for (Cell cell : sortedCells) {
-                Cell converted = CoordinateToCellConverter.indecesToCoordinates(cell, CENTER);
+                Cell converted = cell.toCoordinates();
                 writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
             }
             writer.flush();
