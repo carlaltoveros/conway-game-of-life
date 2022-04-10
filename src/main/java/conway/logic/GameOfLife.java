@@ -33,9 +33,6 @@ import java.util.stream.Collectors;
 
 public class GameOfLife {
 
-    public static final int DIMENSION = Integer.MAX_VALUE;
-    public static final int CENTER = DIMENSION / 2;
-
     private Set<Cell> currentAliveCells;
 
     public GameOfLife(Set<Cell> currentAliveCells) {
@@ -70,17 +67,17 @@ public class GameOfLife {
     public void printCenterBoard() {
         System.out.println("Printing center 21x21 board");
         StringBuilder sb;
-        int numSquares = Math.min(CENTER, 10); // how far left and right from the center should we print --> this produces a 13 x 13 board
-        for (int row = CENTER - numSquares; row < CENTER + numSquares + 1; row++) {
+        int numSquares = 10; // how far left and right from the center should we print --> this produces a 13 x 13 board
+        for (int row = numSquares; row > -numSquares; row--) {
             sb = new StringBuilder();
             sb.append("|");
-            for (int column = CENTER - numSquares; column < CENTER + numSquares + 1; column++) {
+            for (int column = -numSquares; column < numSquares; column++) {
                 Cell cell = new Cell(column, row);
                 int alive = currentAliveCells.contains(cell) ? 1 : 0;
                 sb.append(String.format("%2d", alive)); // print the values of the board
             }
             sb.append(" |");
-            if (row == CENTER) {
+            if (row == 0) {
                 sb.append(" CENTER ROW");
             }
             System.out.println(sb);
@@ -194,19 +191,19 @@ public class GameOfLife {
         pointsToCheck.add(new Cell(1, -1)); // down + right
         pointsToCheck.add(new Cell(-1, -1)); // down + left
 
-        if (column == 0) {
+        if (column == Integer.MIN_VALUE) {
             // we are at the left most column, remove all the points that subtract 1 from column
             pointsToCheck.removeIf( point -> point.getColumn()==-1 );
-        } else if (column == DIMENSION - 1) {
-            // we are at the left most column, remove all points that add 1 to column
+        } else if (column == Integer.MAX_VALUE) {
+            // we are at the right most column, remove all points that add 1 to column
             pointsToCheck.removeIf( point -> point.getColumn()==1 );
         }
 
-        if (row == 0) {
-            // we are at the top most row, remove all points that subtract 1 from row
+        if (row == Integer.MIN_VALUE) {
+            // we are at the bottom most row, remove all points that subtract 1 from row
             pointsToCheck.removeIf( point -> point.getRow()==-1 );
-        } else if (row == DIMENSION - 1) {
-            // we are at the bottom most row, remove all points that add 1 to row
+        } else if (row == Integer.MAX_VALUE) {
+            // we are at the top most row, remove all points that add 1 to row
             pointsToCheck.removeIf( point -> point.getRow()==1 );
         }
 
@@ -247,8 +244,7 @@ public class GameOfLife {
             writer.append(String.format("Iteration #%d%n", iteration));
             writer.append(String.format("Found %d alive cells: printing coordinates%n", currentAliveCells.size()));
             for (Cell cell : sortedCells) {
-                Cell converted = cell.toCoordinates();
-                writer.append(String.format("  X: %d, Y: %d%n", converted.getColumn(), converted.getRow()));
+                writer.append(String.format("  X: %d, Y: %d%n", cell.getColumn(), cell.getRow()));
             }
             writer.flush();
             writer.close();

@@ -28,10 +28,9 @@ public class GameOfLifeBoard extends JPanel implements ComponentListener, MouseL
 
     private void updateArraySize() {
         Set<Cell> removeList = new HashSet<>();
-        for (Cell current : cells) {
-            Cell cellToCheck = current.toCoordinates();
+        for (Cell cellToCheck : cells) {
             if ((cellToCheck.getColumn() > boardSize.width - 1) || (cellToCheck.getRow() > boardSize.height - 1)) {
-                removeList.add(current);
+                removeList.add(cellToCheck);
             }
         }
         cells.removeAll(removeList);
@@ -40,18 +39,17 @@ public class GameOfLifeBoard extends JPanel implements ComponentListener, MouseL
 
     private void deleteCellsOutsideGrid() {
         Set<Cell> cellsToRemove = new HashSet<>();
-        for (Cell cell : cells) {
-            Cell cellToCheck = cell.toCoordinates();
+        for (Cell cellToCheck : cells) {
             if (cellToCheck.getColumn() > boardSize.width - 1 || cellToCheck.getColumn() < 0
                 || cellToCheck.getRow() > boardSize.height - 1 || cellToCheck.getRow() < 0) {
-                cellsToRemove.add(cell);
+                cellsToRemove.add(cellToCheck);
             }
         }
         cells.removeAll(cellsToRemove);
     }
 
     public void toggleCell(int x, int y) {
-        Cell cell = Cell.fromCoordinates(x, y);
+        Cell cell = new Cell(x, y);
         if (cells.contains(cell)) {
             cells.remove(cell);
         } else {
@@ -69,7 +67,7 @@ public class GameOfLifeBoard extends JPanel implements ComponentListener, MouseL
     }
 
     public void addCell(int x, int y) {
-        cells.add(Cell.fromCoordinates(x, y));
+        cells.add(new Cell(x, y));
         repaint();
     }
 
@@ -100,7 +98,6 @@ public class GameOfLifeBoard extends JPanel implements ComponentListener, MouseL
         super.paintComponent(g);
         try {
             for (Cell newCell : cells) {
-                newCell = newCell.toCoordinates();
                 // Draw new cell
                 g.setColor(Color.PINK);
                 g.fillRect(BLOCK_SIZE + (BLOCK_SIZE*newCell.getColumn()), BLOCK_SIZE + (BLOCK_SIZE*newCell.getRow()), BLOCK_SIZE, BLOCK_SIZE);

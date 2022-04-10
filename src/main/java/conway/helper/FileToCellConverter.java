@@ -1,7 +1,5 @@
 package conway.helper;
 
-import conway.logic.GameOfLife;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -41,7 +39,7 @@ public class FileToCellConverter {
                 try {
                     int x = Integer.parseInt(splitLine[0]);
                     int y = Integer.parseInt(splitLine[1]);
-                    Cell cell = Cell.fromCoordinates(x, y);
+                    Cell cell = new Cell(x, y);
                     cells.add(cell);
                 } catch (NumberFormatException e) {
                     System.out.printf("Found illegal int value on line: %d, skipping...%n", lineNum);
